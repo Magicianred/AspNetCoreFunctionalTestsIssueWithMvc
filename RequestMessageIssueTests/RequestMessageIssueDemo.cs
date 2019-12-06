@@ -94,7 +94,7 @@ namespace RequestMessageIssueTests
         }
 
         [Fact]
-        public async Task GivenAnController_AnAction_And_AValidRequest_WhenAssertionTheRequestContent_ItShouldHaveAvailableTheContent()
+        public async Task GivenAnController_AnAction_And_AValidRequest_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
         {
             using var client = _factory.CreateClient();
 
@@ -112,7 +112,7 @@ namespace RequestMessageIssueTests
         }
 
         [Fact]
-        public async Task Given_ARequest_WithoutACorrespondingMVCAction_WhenAssertionTheRequestContent_ItShouldHaveAvailableTheContent()
+        public async Task Given_ARequest_WithoutACorrespondingMVCAction_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
         {
             using var client = _factory.CreateClient();
 
@@ -130,7 +130,7 @@ namespace RequestMessageIssueTests
         }
 
         [Fact]
-        public async Task GivenAnController_AnAction_And_ABadRequestRequest_WhenAssertionTheRequestContent_ItShouldHaveAvailableTheContent()
+        public async Task GivenAnController_AnAction_And_ABadRequestRequest_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
         {
             using var client = _factory.CreateClient();
 
