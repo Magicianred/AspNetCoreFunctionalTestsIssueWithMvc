@@ -107,7 +107,6 @@ namespace RequestMessageIssueTests
 
             // fails, the HttpContent from the originated request doesn't contain the request body
             var requestContent = await response.RequestMessage.Content.ReadAsStringAsync();
-
             Assert.NotEmpty(requestContent);
         }
 
@@ -121,11 +120,10 @@ namespace RequestMessageIssueTests
                     }", Encoding.UTF8, "application/json"));
 
             // as expected
-            Assert.False(response.IsSuccessStatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
-            // fails, the HttpContent from the originated request doesn't contain the request body
+            // passes, the response contains the originated request content
             var requestContent = await response.RequestMessage.Content.ReadAsStringAsync();
-
             Assert.NotEmpty(requestContent);
         }
 
@@ -147,7 +145,7 @@ namespace RequestMessageIssueTests
         }
 
         [Fact]
-        public async Task GivenAnWebHostBuilderSetup_WhenRequestHasContent_ShouldPrintContent()
+        public async Task GivenAnWebHostBuilderSetupAndA404Request_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
         {
             var builder = new WebHostBuilder();
             builder.ConfigureServices(services =>
@@ -163,7 +161,7 @@ namespace RequestMessageIssueTests
             // expected
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
-            // as expected, the request content is not empty, it is "request body"
+            // as expected, the response contains the originated request content
             var requestContent = await response.RequestMessage.Content.ReadAsStringAsync();
             Assert.NotEmpty(requestContent);
         }
