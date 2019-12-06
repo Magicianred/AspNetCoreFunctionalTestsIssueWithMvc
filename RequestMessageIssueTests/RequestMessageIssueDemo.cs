@@ -128,6 +128,28 @@ namespace RequestMessageIssueTests
         }
 
         [Fact]
+        public async Task GivenAnWebHostBuilderSetupAndA404Request_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
+        {
+            var builder = new WebHostBuilder();
+            builder.ConfigureServices(services =>
+            {
+                services.AddRouting();
+            });
+            builder.Configure(app => app.UseRouting());
+            using var testServer = new TestServer(builder);
+            using var client = testServer.CreateClient();
+
+            using var response = await client.PostAsync("/endpoint", new StringContent("request body"));
+
+            // expected
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+            // as expected, the response contains the originated request content
+            var requestContent = await response.RequestMessage.Content.ReadAsStringAsync();
+            Assert.NotEmpty(requestContent);
+        }
+
+        [Fact]
         public async Task GivenAnController_AnAction_And_ABadRequestRequest_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
         {
             using var client = _factory.CreateClient();
@@ -145,21 +167,27 @@ namespace RequestMessageIssueTests
         }
 
         [Fact]
-        public async Task GivenAnWebHostBuilderSetupAndA404Request_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
+        public async Task GivenAnWebHostBuilderSetupAndA400BadRequest_WhenAssertingTheRequestContent_ItShouldHaveAvailableTheContent()
         {
             var builder = new WebHostBuilder();
             builder.ConfigureServices(services =>
             {
                 services.AddRouting();
             });
-            builder.Configure(app => app.UseRouting());
+            builder.Configure(app => app.UseRouting()
+                .UseEndpoints(endpoints => endpoints.Map("/endpoint",
+                    context =>
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        return Task.CompletedTask;
+                    })));
             using var testServer = new TestServer(builder);
             using var client = testServer.CreateClient();
 
             using var response = await client.PostAsync("/endpoint", new StringContent("request body"));
 
             // expected
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
             // as expected, the response contains the originated request content
             var requestContent = await response.RequestMessage.Content.ReadAsStringAsync();
